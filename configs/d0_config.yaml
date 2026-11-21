@@ -1,0 +1,61 @@
+# D0 数据口径审计与单季基准复跑配置
+experiment_name: "D0_data_audit"
+raw_data_root: ".."              # 只读指向根目录下的 31 个申万一级行业文件夹
+output_root: "."                 # 相对于 重建实验方案/
+
+# 季度范围（2021q1 - 2025q3，共 19 季）
+quarters:
+  - "2021q1"
+  - "2021q2"
+  - "2021q3"
+  - "2021q4"
+  - "2022q1"
+  - "2022q2"
+  - "2022q3"
+  - "2022q4"
+  - "2023q1"
+  - "2023q2"
+  - "2023q3"
+  - "2023q4"
+  - "2024q1"
+  - "2024q2"
+  - "2024q3"
+  - "2024q4"
+  - "2025q1"
+  - "2025q2"
+  - "2025q3"
+
+# 移出主样本的金融行业（单独保存）
+excluded_industries:
+  - "银行"
+  - "非银金融"
+
+# 矩阵裁剪模式:
+#   "auto_by_name"  = 仅当末行/末列名称为“合计/总计/Total”时才剔除（推荐，避免误删末位真实企业）
+#   "legacy_always" = 沿用原代码无条件 iloc[:-1, :-1]
+strip_last_row_mode: "auto_by_name"
+
+# 样本清洗规则（D0 沿用现行 8.31 规范并额外统计 cost==0 数量）
+cleaning:
+  require_revenue_gt_zero: true
+  require_cost_ge_zero: true     # D0 审计会额外单独统计 cost == 0 的企业-季度数，供后续第 5 条严格剔除参考
+
+# D0.6 单季口径基准复跑参数（沿用 11.16 现有 8.31 代码设定）
+baseline_sim:
+  gamma_q: 0.25
+  p0: 0.5
+  phi: 0.5
+  tmax: 1000
+  disparity_alpha: 0.05
+  force_mode: "8.31"
+  sim_network: "full"
+  vis_mode: "zero"
+  step_order: "710"
+  healthy_pass_mode: "original"
+  theta_mode: "huber"
+  alpha_p: 0.5
+  gamma_v: 3.0
+  seed_salt: 0
+
+# 并行进程数（可在命令行用 --workers 覆盖）
+workers: 4

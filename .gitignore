@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+runs/
+figures/
+data/clean/
+.DS_Store
+Thumbs.db
