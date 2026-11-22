@@ -27,6 +27,7 @@ from common import (
     create_run_dir, save_seeds, read_stock_matrix_safe, compute_sri_tables,
 )
 from engine_legacy_d1 import run_single_cell
+from plotting import generate_standard_5figs
 
 plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "DejaVu Sans"]
 plt.rcParams["axes.unicode_minus"] = False
@@ -332,6 +333,8 @@ def main():
         fig_path = os.path.join(fig_dir, "D0_SRI_comparison.png")
         plot_d0_sri(sri_main, sri_all if not df_fin.empty else None, fig_path, caption)
         plot_d0_sri(sri_main, sri_all if not df_fin.empty else None, os.path.join(run_dir, "D0_SRI_comparison.png"), caption)
+        generate_standard_5figs(df_main, run_dir, note_prefix=f"Main Sample, gamma={gamma_q}")
+        logger.info("已输出论文标准五图与 sri_index.csv 至 %s (figs_ma4/ 与 figs_raw_19q/)", run_dir)
 
     logger.info("D0.6 仿真完成 (%.1fs) | 产出 %d 行 | 结果目录: %s", time.time() - t1, len(df_sim), run_dir)
     if not sri_comp.empty:

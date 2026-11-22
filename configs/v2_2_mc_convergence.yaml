@@ -1,0 +1,73 @@
+# ==============================================================================
+# V2.2 渐进版配置：完全覆盖 V2.1 + 叠加蒙特卡洛重复与置信区间（第 10 条）
+# ------------------------------------------------------------------------------
+# 完全继承 V2.0 + V2.1 的全部 11 条修正，并叠加第 10 条：
+#   [第 10 条] 每行业-季度至少 R=50 次独立种子重复；若 BRT 均值标准误 > 0.005 自动扩至 200 次，
+#              输出均值与 5%-95% 分位区间（用于正式定稿）。
+# ==============================================================================
+version_tag: "V2.2"
+experiment_name: "V2_2_mc_convergence"
+raw_data_root: "data/clean"
+output_root: "."
+
+quarters:
+  - "2021q1"
+  - "2021q2"
+  - "2021q3"
+  - "2021q4"
+  - "2022q1"
+  - "2022q2"
+  - "2022q3"
+  - "2022q4"
+  - "2023q1"
+  - "2023q2"
+  - "2023q3"
+  - "2023q4"
+  - "2024q1"
+  - "2024q2"
+  - "2024q3"
+  - "2024q4"
+  - "2025q1"
+  - "2025q2"
+  - "2025q3"
+
+excluded_industries:
+  - "银行"
+  - "非银金融"
+
+strip_last_row_mode: "auto_by_name"
+
+model_params:
+  gamma_q: 0.25
+  p0: 0.5
+  phi: 0.5
+  tmax: 1000
+  disparity_alpha: 0.05
+  sim_network: "full"
+  transpose_edges: false
+
+  # --- 继承 V2.0 + V2.1 全部修正 ---
+  buffer_mode: "equity"
+  delta_shock: 0.0
+  vis_mode: "betweenness"
+  vis_formula: "paper"
+  alpha_p: 0.5
+  gamma_v: 1.0
+  margin_mode: "v1_net_nonneg"
+  k_mode: "paper_rev_over_cost"
+  require_cost_gt_zero: true
+  direct_delta_s: true
+  ego_mode: "all_neighbors"
+  secondary_impact_mode: "geometric_pb"
+  healthy_pass_mode: "v1_random_single"
+  update_mode: "synchronous"
+  stop_mode: "dual_criterion"
+  stop_tol: 1.0e-6
+
+  # --- V2.2 新增叠加修正（第 10 条：重复次数与标准误自动扩增）---
+  n_repeats: 50
+  auto_expand_se: 0.005
+  max_repeats: 200
+  seed_salt: 0
+
+workers: 8

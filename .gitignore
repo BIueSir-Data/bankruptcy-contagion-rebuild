@@ -5,3 +5,8 @@ figures/
 data/clean/
 .DS_Store
 Thumbs.db
+# 版本归档仅跟踪 README.md 与配置，忽略大型 CSV/PNG/日志
+版本归档/**/*.csv
+版本归档/**/*.png
+版本归档/**/*.log
+版本归档/**/*.json

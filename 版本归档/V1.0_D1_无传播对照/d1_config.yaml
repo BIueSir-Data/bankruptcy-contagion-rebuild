@@ -1,0 +1,58 @@
+# D1 无传播基准对照配置（沿用 11.16 现有网络与代码）
+experiment_name: "D1_no_propagation_benchmark"
+raw_data_root: "data/clean"      # 指向重建后的干净 31 行业单季面板目录（由 src/build_clean_quarterly.py 生成）
+output_root: "."                 # 相对于 重建实验方案/
+
+quarters:
+  - "2021q1"
+  - "2021q2"
+  - "2021q3"
+  - "2021q4"
+  - "2022q1"
+  - "2022q2"
+  - "2022q3"
+  - "2022q4"
+  - "2023q1"
+  - "2023q2"
+  - "2023q3"
+  - "2023q4"
+  - "2024q1"
+  - "2024q2"
+  - "2024q3"
+  - "2024q4"
+  - "2025q1"
+  - "2025q2"
+  - "2025q3"
+
+# 主样本移出金融两行业（如需同时单独跑金融行业备份，设 also_run_excluded: true）
+excluded_industries:
+  - "银行"
+  - "非银金融"
+also_run_excluded: false
+
+# 矩阵裁剪模式: "auto_by_name" | "legacy_always"
+strip_last_row_mode: "auto_by_name"
+
+# D1 要求 γ = 0.25 与 0.45 各跑一次（同一 B(0)、同一组种子，分别跑传播开与传播关）
+gamma_list:
+  - 0.25
+  - 0.45
+
+# 沿用 11.16 现有网络与 8.31 基准代码参数
+sim_params:
+  p0: 0.5
+  phi: 0.5
+  tmax: 1000
+  disparity_alpha: 0.05
+  force_mode: "8.31"
+  sim_network: "full"
+  vis_mode: "zero"
+  step_order: "710"
+  healthy_pass_mode: "original"
+  theta_mode: "huber"
+  alpha_p: 0.5
+  gamma_v: 3.0
+  seed_salt: 0
+
+# 并行进程数（建议本机设 4 或 8，可在命令行用 --workers 覆盖）
+workers: 4

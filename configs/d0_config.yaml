@@ -1,6 +1,6 @@
 # D0 数据口径审计与单季基准复跑配置
 experiment_name: "D0_data_audit"
-raw_data_root: ".."              # 只读指向根目录下的 31 个申万一级行业文件夹
+raw_data_root: "data/clean"      # 指向重建后的干净 31 行业单季面板目录（由 src/build_clean_quarterly.py 生成）
 output_root: "."                 # 相对于 重建实验方案/
 
 # 季度范围（2021q1 - 2025q3，共 19 季）

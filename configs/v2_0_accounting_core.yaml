@@ -1,0 +1,81 @@
+# ==============================================================================
+# V2.0 渐进版配置：会计口径与社会力核心修复（对应修订第 1, 3, 4, 5, 12 条）
+# ------------------------------------------------------------------------------
+# 相对 V1.0（干净单季数据 + 旧版 8.31 引擎）新增的修正：
+#   [第 1 条] 缓冲与阈值：C_i(0) = total_assets - total_liab（净资产），U_i = 0
+#   [第 3 条] 可视度项：alpha * exp(-gamma_v * vis_b) + (1 - alpha)，alpha=0.5, gamma_v=1.0
+#   [第 4 条] 利润率非负截断：V1 = max(tau, 0)，记录被截断企业数
+#   [第 5 条] k_b 取倒数修正为 revenue/cost (>1)；ΔS 直接相乘不除 τ；严格剔除 rev<=0 或 cost<=0
+#   [第 12 条] 损失率 = Σ(C_i(0)-C_i(T))^+ / ΣC_i(0)^+（分母为0记NA）；Fagiolo 有向加权 WCC；SRI 原值
+# ------------------------------------------------------------------------------
+# 本版本先保持旧版动力学开关（待 V2.1 叠加覆盖），且 R=1 单组主设定（不做敏感性扫描）。
+# ==============================================================================
+version_tag: "V2.0"
+experiment_name: "V2_0_accounting_core"
+raw_data_root: "data/clean"
+output_root: "."
+
+quarters:
+  - "2021q1"
+  - "2021q2"
+  - "2021q3"
+  - "2021q4"
+  - "2022q1"
+  - "2022q2"
+  - "2022q3"
+  - "2022q4"
+  - "2023q1"
+  - "2023q2"
+  - "2023q3"
+  - "2023q4"
+  - "2024q1"
+  - "2024q2"
+  - "2024q3"
+  - "2024q4"
+  - "2025q1"
+  - "2025q2"
+  - "2025q3"
+
+excluded_industries:
+  - "银行"
+  - "非银金融"
+
+strip_last_row_mode: "auto_by_name"
+
+model_params:
+  # --- 基础阈值与网络 ---
+  gamma_q: 0.25
+  p0: 0.5
+  phi: 0.5
+  tmax: 1000
+  disparity_alpha: 0.05
+  sim_network: "full"
+  transpose_edges: false
+
+  # --- V2.0 新增修正（第 1, 3, 4, 5, 12 条）---
+  buffer_mode: "equity"                 # 第 1 条：所有者权益 C_i(0) = total_assets - total_liab, U_i = 0
+  delta_shock: 0.0                      # 外生缓冲冲击（主设定 0）
+  vis_mode: "betweenness"               # 第 3 条：启用基准化介数可视度
+  vis_formula: "paper"                  # 第 3 条：alpha * exp(-gamma_v * vis_b) + (1 - alpha)
+  alpha_p: 0.5
+  gamma_v: 1.0
+  margin_mode: "v1_net_nonneg"          # 第 4 条：V1 = max(tau, 0)
+  k_mode: "paper_rev_over_cost"         # 第 5 条：k_b = revenue / operating_expense (>1)
+  require_cost_gt_zero: true            # 第 5 条：严格剔除 cost <= 0
+  direct_delta_s: true                  # 第 5 条：ΔS 直接相乘，避免 F/τ 除零
+
+  # --- 动力学机制（V2.0 暂沿用旧设定，V2.1 将全覆盖并升级）---
+  ego_mode: "legacy_inverted"
+  secondary_impact_mode: "legacy"
+  healthy_pass_mode: "v1_random_single"
+  update_mode: "synchronous"
+  stop_mode: "legacy"
+  stop_tol: 1.0e-6
+
+  # --- 重复次数（V2.0/V2.1 先 R=1 快速验证，V2.2 升至 50/200）---
+  n_repeats: 1
+  auto_expand_se: 0.0
+  max_repeats: 1
+  seed_salt: 0
+
+workers: 4

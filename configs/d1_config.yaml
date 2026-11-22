@@ -1,6 +1,6 @@
 # D1 无传播基准对照配置（沿用 11.16 现有网络与代码）
 experiment_name: "D1_no_propagation_benchmark"
-raw_data_root: ".."              # 只读指向根目录下的 31 个申万一级行业文件夹
+raw_data_root: "data/clean"      # 指向重建后的干净 31 行业单季面板目录（由 src/build_clean_quarterly.py 生成）
 output_root: "."                 # 相对于 重建实验方案/
 
 quarters:

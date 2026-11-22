@@ -1,0 +1,82 @@
+# ==============================================================================
+# V2.1 渐进版配置：完全覆盖 V2.0 + 叠加传染动力学与同步更新修正（第 2, 6, 7, 8, 9, 11 条）
+# ------------------------------------------------------------------------------
+# 完全继承 V2.0 的全部会计与社会力修复（第 1, 3, 4, 5, 12 条），并新增：
+#   [第 2 条] 修复旧版 Ego 查反邻居方向的 Bug，统一为全邻居破产占比 (ego_mode: all_neighbors)
+#   [第 6 条] 二次影响几何衰减：p_b = p0 * ego_ratio，上步受冲击则以概率 p_b 再受 phi * ||F||
+#   [第 7 条] 健康节点下传总量守恒（V1 随机单下游，强制 <= ΔS；V2 开关已预留）
+#   [第 8 条] 同步更新（第 s 步基于 s-1 状态统一算力、统一扣减、统一激活）
+#   [第 9 条] 双重停止规则（连 3 步无新增激活且残余二次影响 < 1e-6 * ΣC_i(0)^+，或 S_max=1000）
+#   [第 11 条] 输出 γ -> θ_k -> BR0 诊断表（预留外生缓冲冲击 δ=0）
+# ------------------------------------------------------------------------------
+# 仍为 R=1 单组主设定（不做多参数敏感性扫描），便于快速验证全量效果。
+# ==============================================================================
+version_tag: "V2.1"
+experiment_name: "V2_1_dynamics_sync"
+raw_data_root: "data/clean"
+output_root: "."
+
+quarters:
+  - "2021q1"
+  - "2021q2"
+  - "2021q3"
+  - "2021q4"
+  - "2022q1"
+  - "2022q2"
+  - "2022q3"
+  - "2022q4"
+  - "2023q1"
+  - "2023q2"
+  - "2023q3"
+  - "2023q4"
+  - "2024q1"
+  - "2024q2"
+  - "2024q3"
+  - "2024q4"
+  - "2025q1"
+  - "2025q2"
+  - "2025q3"
+
+excluded_industries:
+  - "银行"
+  - "非银金融"
+
+strip_last_row_mode: "auto_by_name"
+
+model_params:
+  # --- 基础阈值与网络 ---
+  gamma_q: 0.25
+  p0: 0.5
+  phi: 0.5
+  tmax: 1000
+  disparity_alpha: 0.05
+  sim_network: "full"
+  transpose_edges: false
+
+  # --- 继承 V2.0 全部修正（第 1, 3, 4, 5, 12 条）---
+  buffer_mode: "equity"
+  delta_shock: 0.0
+  vis_mode: "betweenness"
+  vis_formula: "paper"
+  alpha_p: 0.5
+  gamma_v: 1.0
+  margin_mode: "v1_net_nonneg"
+  k_mode: "paper_rev_over_cost"
+  require_cost_gt_zero: true
+  direct_delta_s: true
+
+  # --- V2.1 新增叠加修正（第 2, 6, 7, 8, 9, 11 条）---
+  ego_mode: "all_neighbors"             # 修复旧代码 1a/1b 查反邻居方向 Bug
+  secondary_impact_mode: "geometric_pb" # 第 6 条：几何衰减二次影响
+  healthy_pass_mode: "v1_random_single" # 第 7 条：V1 随机单下游（总量 <= ΔS）
+  update_mode: "synchronous"            # 第 8 条：严格同步更新
+  stop_mode: "dual_criterion"           # 第 9 条：双重早停规则
+  stop_tol: 1.0e-6
+
+  # --- 重复次数（V2.1 先 R=1 快速跑通，V2.2 覆盖升级为 50/200）---
+  n_repeats: 1
+  auto_expand_se: 0.0
+  max_repeats: 1
+  seed_salt: 0
+
+workers: 4
