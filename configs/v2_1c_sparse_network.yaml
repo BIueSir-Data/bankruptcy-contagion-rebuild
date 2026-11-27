@@ -1,0 +1,71 @@
+# ==============================================================================
+# V2.1c：完全覆盖 V2.1b（含毛利率 V2）+ 稀疏化骨干网络版 (sim_network: sparse)
+# ------------------------------------------------------------------------------
+# 在 V2.1b 基础上，将仿真网络从稠密全连接矩阵切换为 disparity_alpha=0.05
+# 显著性过滤后的稀疏骨干网，消除边权份额 share_up 被稀释至 ~1/N 的问题。
+# ==============================================================================
+version_tag: "V2.1c"
+experiment_name: "V2_1c_sparse_network"
+raw_data_root: "data/clean"
+output_root: "."
+
+quarters:
+  - "2021q1"
+  - "2021q2"
+  - "2021q3"
+  - "2021q4"
+  - "2022q1"
+  - "2022q2"
+  - "2022q3"
+  - "2022q4"
+  - "2023q1"
+  - "2023q2"
+  - "2023q3"
+  - "2023q4"
+  - "2024q1"
+  - "2024q2"
+  - "2024q3"
+  - "2024q4"
+  - "2025q1"
+  - "2025q2"
+  - "2025q3"
+
+excluded_industries:
+  - "银行"
+  - "非银金融"
+
+strip_last_row_mode: "auto_by_name"
+
+model_params:
+  gamma_q: 0.25
+  p0: 0.5
+  phi: 0.5
+  tmax: 1000
+  disparity_alpha: 0.05
+  sim_network: "sparse"                 # <--- V2.1c 核心改动：稀疏骨干网 (alpha=0.05)
+  transpose_edges: false
+
+  # --- 完全继承 V2.1b（含毛利率 V2）---
+  buffer_mode: "equity"
+  delta_shock: 0.0
+  vis_mode: "betweenness"
+  vis_formula: "paper"
+  alpha_p: 0.5
+  gamma_v: 1.0
+  margin_mode: "v2_gross_nonneg"
+  k_mode: "paper_rev_over_cost"
+  require_cost_gt_zero: true
+  direct_delta_s: true
+  ego_mode: "all_neighbors"
+  secondary_impact_mode: "geometric_pb"
+  healthy_pass_mode: "v1_random_single"
+  update_mode: "synchronous"
+  stop_mode: "dual_criterion"
+  stop_tol: 1.0e-6
+
+  n_repeats: 1
+  auto_expand_se: 0.0
+  max_repeats: 1
+  seed_salt: 0
+
+workers: 8

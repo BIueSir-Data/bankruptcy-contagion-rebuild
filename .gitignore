@@ -5,8 +5,20 @@ figures/
 data/clean/
 .DS_Store
 Thumbs.db
-# 版本归档仅跟踪 README.md 与配置，忽略大型 CSV/PNG/日志
+# 版本归档默认忽略大体积逐窗面板与批量单图，仅保留说明、配置、核心汇总 CSV 与总览图供 GitHub/Gemini 直接查阅
 版本归档/**/*.csv
 版本归档/**/*.png
 版本归档/**/*.log
 版本归档/**/*.json
+!版本归档/V1_V2_all31_vs_main29_comparison.csv
+!版本归档/V1_V2_SRI_all31_by_quarter.csv
+!版本归档/V2_suite_comparison.csv
+!版本归档/V1.0_D0_干净单季基线/d0_sample_flow.csv
+!版本归档/V1.0_D0_干净单季基线/d0_quarterly_check.csv
+!版本归档/V1.0_D1_无传播对照/d1_industry_summary.csv
+!版本归档/V1.0_D1_无传播对照/D1_BR0_vs_dBR_scatter.png
+!版本归档/V2_辅助诊断_gamma单调性检验/gamma_summary.csv
+!版本归档/结果图与SRI总汇总/SRI_All_Versions_Master.csv
+!版本归档/结果图与SRI总汇总/1_SRI_All_Versions_Comparison_MA4.png
+!版本归档/结果图与SRI总汇总/2_SRI_All_Versions_Comparison_Raw19Q.png
+!版本归档/结果图与SRI总汇总/3_Industry_IRCI_Comparison_Heatmap.png

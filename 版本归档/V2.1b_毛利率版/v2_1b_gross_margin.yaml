@@ -1,0 +1,72 @@
+# ==============================================================================
+# V2.1b：完全覆盖 V2.1 + 第 4 条 V2 毛利率版 (margin_mode: v2_gross_nonneg)
+# ------------------------------------------------------------------------------
+# 对照 V2.1 (V1 净利润率 max(tau, 0))：
+#   使用毛利率 max(1 - operating_expense / revenue, 0) 替代净利润率，
+#   避免 24.9% 亏损企业因净利润为负被截断为 0 而免受上游/下游破产冲击。
+# ==============================================================================
+version_tag: "V2.1b"
+experiment_name: "V2_1b_gross_margin"
+raw_data_root: "data/clean"
+output_root: "."
+
+quarters:
+  - "2021q1"
+  - "2021q2"
+  - "2021q3"
+  - "2021q4"
+  - "2022q1"
+  - "2022q2"
+  - "2022q3"
+  - "2022q4"
+  - "2023q1"
+  - "2023q2"
+  - "2023q3"
+  - "2023q4"
+  - "2024q1"
+  - "2024q2"
+  - "2024q3"
+  - "2024q4"
+  - "2025q1"
+  - "2025q2"
+  - "2025q3"
+
+excluded_industries:
+  - "银行"
+  - "非银金融"
+
+strip_last_row_mode: "auto_by_name"
+
+model_params:
+  gamma_q: 0.25
+  p0: 0.5
+  phi: 0.5
+  tmax: 1000
+  disparity_alpha: 0.05
+  sim_network: "full"
+  transpose_edges: false
+
+  # --- 完全继承 V2.1，仅切换第 4 条为 V2 毛利率 ---
+  buffer_mode: "equity"
+  delta_shock: 0.0
+  vis_mode: "betweenness"
+  vis_formula: "paper"
+  alpha_p: 0.5
+  gamma_v: 1.0
+  margin_mode: "v2_gross_nonneg"        # <--- V2.1b 核心改动：毛利率 max(1 - E/R, 0)
+  k_mode: "paper_rev_over_cost"
+  require_cost_gt_zero: true
+  direct_delta_s: true
+  ego_mode: "all_neighbors"
+  secondary_impact_mode: "geometric_pb"
+  healthy_pass_mode: "v1_random_single"
+  update_mode: "synchronous"
+  stop_mode: "dual_criterion"
+  stop_tol: 1.0e-6
+
+  n_repeats: 1
+  auto_expand_se: 0.0
+  max_repeats: 1
+  seed_salt: 0
+
+workers: 8
